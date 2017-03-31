@@ -14,7 +14,7 @@ mysql = MySQL()
 app.config['MYSQL_DATABASE_USER'] = 'root' # user Anna probably has a password?
 app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'carshare_sushi_v2'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['MYSQL_DATABASE_HOST'] = 'localhost' # this machine
 mysql.init_app(app)
 
 #connect to db
