@@ -37,6 +37,14 @@ def hello2(name="no name given"):
     return render_template("index.html", name=name)
     #http://localhost:5000/index/goldfish will print "hello goldfish"
 
+@app.route("/homepage") # when someone visits slash http://localhost:5000/ on your webpage, run this method
+def hello3():
+	return render_template("index_homepage.html")
+
+@app.route('/showSignUp')
+def showSignUp():
+    return render_template('signup.html')
+
 
 # @app.route('/showEmployee')
 # def db():
