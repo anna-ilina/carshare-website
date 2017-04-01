@@ -20,7 +20,7 @@ mysql.init_app(app)
 conn = mysql.connect()
 
 # #create cursor to query db
-# cursor = conn.cursor()
+cursor = conn.cursor()
 
 
 @app.route("/") # when someone visits slash http://localhost:5000/ on your webpage, run this method
@@ -81,26 +81,29 @@ def signup():
 		return render_template('signup.html')
 	elif request.method == 'POST':
 		print(str(request.args))
-		# firstName = request.values.get('inputFirstName')
-		# lastName = request.values.get('inputLastName')
-		# email = request.values.get('inputEmail')
-		# address = request.values.get('inputAddress')
-		# phone = request.values.get('inputPhone')
-		# driversLicense = request.values.get('inputDriversLicense')
-		# discountCode = request.values.get('discountCode')
-		# password = request.values.get('inputPassword')
+		firstName = request.values.get('inputFirstName')
+		lastName = request.values.get('inputLastName')
+		email = request.values.get('inputEmail')
+		address = request.values.get('inputAddress')
+		phone = request.values.get('inputPhone')
+		driversLicense = request.values.get('inputDriversLicense')
+		discountCode = request.values.get('discountCode')
+		password = request.values.get('inputPassword')
 
-		firstName = "Kate"
-		lastName = "Middleton"
-		email = "kate@london.uk"
-		address = "1 Buckingham Palace"
-		phone = "12345"
-		driversLicense = "I-AM-ROYAL"
-		password = "katepassword"
-		discountCode = "wer"
+		# firstName = "Kate"
+		# lastName = "Middleton"
+		# email = "kate@london.uk"
+		# address = "1 Buckingham Palace"
+		# phone = "12345"
+		# driversLicense = "I-AM-ROYAL"
+		# password = "katepassword"
+		# discountCode = "wer"
+
+
 		#todo: check that password is valid, otherwise ask to try again? somehow?
 
-		cursor = mysql.connect().cursor()
+		#todo: make "discount code" field optional
+
 		sql = "SELECT * from member where email=%s"
 
 		cursor.execute(sql, (email))
@@ -122,7 +125,7 @@ def signup():
 #todo: add checks for valid address and phone number etc
 
 def createNewMemberID():
-	return "1000000"
+	return "1000001" #todo: randomize this!!
 
 def checkIfAdmin(discountCode):
 	if discountCode == "makeMeAdmin":
