@@ -17,7 +17,7 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost' # this machine
 mysql.init_app(app)
 
 # #connect to db
-# conn = mysql.connect()
+conn = mysql.connect()
 
 # #create cursor to query db
 # cursor = conn.cursor()
@@ -81,15 +81,23 @@ def signup():
 		return render_template('signup.html')
 	elif request.method == 'POST':
 		print(str(request.args))
-		firstName = request.values.get('inputFirstName')
-		lastName = request.values.get('inputLastName')
-		email = request.values.get('inputEmail')
-		address = request.values.get('inputAddress')
-		phone = request.values.get('inputPhone')
-		driversLicense = request.values.get('inputDriversLicense')
-		discountCode = request.values.get('discountCode')
-		password = request.values.get('inputPassword')
+		# firstName = request.values.get('inputFirstName')
+		# lastName = request.values.get('inputLastName')
+		# email = request.values.get('inputEmail')
+		# address = request.values.get('inputAddress')
+		# phone = request.values.get('inputPhone')
+		# driversLicense = request.values.get('inputDriversLicense')
+		# discountCode = request.values.get('discountCode')
+		# password = request.values.get('inputPassword')
 
+		firstName = "Kate"
+		lastName = "Middleton"
+		email = "kate@london.uk"
+		address = "1 Buckingham Palace"
+		phone = "12345"
+		driversLicense = "I-AM-ROYAL"
+		password = "katepassword"
+		discountCode = "wer"
 		#todo: check that password is valid, otherwise ask to try again? somehow?
 
 		cursor = mysql.connect().cursor()
@@ -118,15 +126,16 @@ def createNewMemberID():
 
 def checkIfAdmin(discountCode):
 	if discountCode == "makeMeAdmin":
-		return 1
+		return "1"
 	else:
-		return 0
+		return "0"
 
 def assignMonthlyMemberFee(discountCode):
 	#todo: have a field where they can enter a discount code ("20-OFF"), use here
 	if discountCode == "20-OFF":
-		return 55
-	return 75
+		return "55"
+	else:
+		return "75"
 
 # @app.route('/showEmployee')
 # def db():
