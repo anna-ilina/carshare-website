@@ -78,31 +78,49 @@ def hello3():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
 	if request.method == 'GET':
-		return render_template('signup_simple.html')
+		return render_template('signup.html')
 	elif request.method == 'POST':
 		print(str(request.args))
-		firstName = request.args.get('first')
-		lastName = request.args.get('last')
-		username = request.args.get('inputUsername')
-		email = request.args.get('inputEmail')
-		password = request.args.get('inputPassword')
-		cursor = mysql.connect().cursor()
-		sql = "SELECT * from member where FName=\"%\"s and LName=\"%s\""
-		print (firstName)
-		print (lastName)
+		firstName = request.values.get('inputFirstName')
+		lastName = request.values.get('inputLastName')
+		email = request.values.get('inputEmail')
+		address = request.values.get('inputAddress')
+		phone = request.values.get('inputPhone')
+		driversLicense = request.values.get('inputDriversLicense')
+		discountCode = request.values.get('discountCode')
+		password = request.values.get('inputPassword')
 
-		print(firstName + " " + lastName + " " + sql)
-		cursor.execute(sql, (firstName, lastName))
+		#todo: check that these are all valid
+
+		cursor = mysql.connect().cursor()
+		sql = "SELECT * from member where email=%s"
+
+		cursor.execute(sql, (email))
 		data = cursor.fetchone()
 
 
 		#cursor.execute("SELECT * from member where Username='" + username + "' and Password='" + password + "'")
 		#data = cursor.fetchone()
-		if data is None:
-			return "Username or Password is wrong"
+		if data != None:
+			return "This email is already registered for kingston carshare. Please sign in or enter a new email."
 		else:
-			return str("Logged in successfully" + str(data))
+			newMemberID = createNewMemberID()
+			monthlyMemberFee = assignMonthlyMemberFee(discountCode)
+			sql = "INSERT INTO member (%s,"
+			cursor.execute(sql, (newMemberID, firstName, lastName, address, phone, email, driversLicense, monthlyMemberFee, password, isAdmin))
+			return str("Signed up successfully? Check db")
 	    #do a check if admin
+
+#todo: add checks for valid address and phone number etc
+
+def createNewMemberID():
+	return "1000000"
+
+def assignMonthlyMemberFee(discountCode):
+	#todo: have a field where they can enter a discount code ("20-OFF"), use here
+	if discountCode == "20-OFF":
+		return 55
+	return 75
 
 # @app.route('/showEmployee')
 # def db():
