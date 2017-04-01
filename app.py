@@ -16,11 +16,11 @@ app.config['MYSQL_DATABASE_DB'] = 'carshare_sushi_v2'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost' # this machine
 mysql.init_app(app)
 
-#connect to db
-conn = mysql.connect()
+# #connect to db
+# conn = mysql.connect()
 
-#create cursor to query db
-cursor = conn.cursor()
+# #create cursor to query db
+# cursor = conn.cursor()
 
 
 @app.route("/") # when someone visits slash http://localhost:5000/ on your webpage, run this method
@@ -90,24 +90,24 @@ def signup():
 		discountCode = request.values.get('discountCode')
 		password = request.values.get('inputPassword')
 
-		#todo: check that these are all valid
+		#todo: check that password is valid, otherwise ask to try again? somehow?
 
 		cursor = mysql.connect().cursor()
 		sql = "SELECT * from member where email=%s"
 
 		cursor.execute(sql, (email))
-		data = cursor.fetchone()
+		data = cursor.fetchone() 
 
 
-		#cursor.execute("SELECT * from member where Username='" + username + "' and Password='" + password + "'")
-		#data = cursor.fetchone()
 		if data != None:
 			return "This email is already registered for kingston carshare. Please sign in or enter a new email."
 		else:
 			newMemberID = createNewMemberID()
 			monthlyMemberFee = assignMonthlyMemberFee(discountCode)
-			sql = "INSERT INTO member (%s,"
+			isAdmin = checkIfAdmin(discountCode) #0 is false
+			sql = "INSERT INTO member VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 			cursor.execute(sql, (newMemberID, firstName, lastName, address, phone, email, driversLicense, monthlyMemberFee, password, isAdmin))
+			conn.commit()
 			return str("Signed up successfully? Check db")
 	    #do a check if admin
 
@@ -115,6 +115,12 @@ def signup():
 
 def createNewMemberID():
 	return "1000000"
+
+def checkIfAdmin(discountCode):
+	if discountCode == "makeMeAdmin":
+		return 1
+	else:
+		return 0
 
 def assignMonthlyMemberFee(discountCode):
 	#todo: have a field where they can enter a discount code ("20-OFF"), use here
