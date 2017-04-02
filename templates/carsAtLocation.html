@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% set active_page = "carsAtLocation" %}
+ 
+{% block content %}
+
+      <div class="jumbotron">
+		<h3>View our cars!</h3>
+        <form>
+		<input type="radio" name="site" value={{FirstAddress}} checked> {{firstCar}}<br>
+		<input type="radio" name="site" value={{SecondAddress}}> {{SecondAddress}}<br>
+		</form>
+      </div>
+
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% set active_page = "locations2" %}
+ 
+{% block content %}
+
+      <div class="jumbotron">
+		<h3>Select a location!</h3>
+		<form class="form-signin" action="/signup" method="post">
+		
+		{% for places in theThing %}
+			<form>
+			<input type="radio" name="sites" value={{places[0]}}> {{places[0]}}<br>
+			</form>
+		{% endfor %}
+		
+		<input type="submit" class="btn btn-lg btn-primary btn-block" value="See cars at location!">
+      </div>
+	</form>
+
+
+{% endblock %}
