@@ -64,6 +64,8 @@ def signin():
 		else:
 			return redirect(url_for('welcome_admin'))
 
+
+
 @app.route('/welcome_user')
 def welcome_user():
 	return render_template('welcome_user.html', firstName = session['FName'])

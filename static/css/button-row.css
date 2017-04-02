@@ -1,0 +1,19 @@
+.croppp {
+ height: 300px;
+ width: 400px;
+ overflow: hidden;
+}
+.croppp img {
+ height: 400px;
+ width: auto;
+}
+
+.img-anna {
+    position: relative;
+    float: left;
+    width:  100px;
+    height: 100px;
+    background-position: 50% 50%;
+    background-repeat:   no-repeat;
+    background-size:     cover;
+}
