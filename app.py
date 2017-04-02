@@ -4,10 +4,11 @@
 #cd C:\Users\Anya\Documents\!School\CISC332\make-website
 # to get requirements, cd into there and type "setup.cmd"
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask.ext.mysql import MySQL
 app = Flask(__name__)
 mysql = MySQL()
+app.secret_key = 'SUSHI'
  
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root' # user Anna probably has a password?
@@ -25,62 +26,48 @@ cursor = conn.cursor()
 
 @app.route("/") # when someone visits slash http://localhost:5000/ on your webpage, run this method
 def hello():
-	cursor.execute('SELECT * FROM car')
-	return str(cursor.fetchall()) # or .fetchone()
-    #return "Hello World!"
+	return redirect(url_for('homepage'))
 
-@app.route("/index/") # when someone visits http://localhost:5000/index/, run this method
-@app.route("/index/<name>")
-def hello2(name="no name given"):
-    #return "<h1>Hello World again!</h1>"
-    return render_template("index.html", name=name)
-    #http://localhost:5000/index/goldfish will print "hello goldfish"
+# @app.route("/index/") # when someone visits http://localhost:5000/index/, run this method
+# @app.route("/index/<name>")
+# def hello2(name="no name given"):
+#     #return "<h1>Hello World again!</h1>"
+#     return render_template("index.html", name=name)
+#     #http://localhost:5000/index/goldfish will print "hello goldfish"
 
 @app.route("/homepage") # when someone visits slash http://localhost:5000/ on your webpage, run this method
-def hello3():
+def homepage():
 	return render_template("index_homepage.html")
 
-# @app.route('/showSignUp', methods=['GET'])
-# def showSignUp():
-#     return render_template('signup.html')
+@app.route('/signin', methods=['GET', 'POST'])
+def signin():
+	if request.method == 'GET':
+		return render_template('signin.html')
+	elif request.method == 'POST':
+		email = request.values.get('inputEmail')
+		password = request.values.get('inputPassword')
 
-# @app.route('/signUp', methods=['GET', 'POST'])
-# def signUp():
-# 	if request.method == 'GET':
-# 		return render_template('signup.html')
-# 	elif request.method == 'POST':
+		sql = "SELECT FName from member where email=%s and password=%s"
+		cursor.execute(sql, (email, password))
+		data = cursor.fetchone() 
 
-# 	    # create user code will be here !!
-# 	    # read the posted values from the UI
-# 	    _name = request.form['inputName']
-# 	    _email = request.form['inputEmail']
-# 	    _password = request.form['inputPassword']
+		if data == None:
+			return render_template('signin.html', errorMessage="Username or password incorrect. Please try again.")
+		else:
+			session['email'] = email
+			session['FName'] = data[0]
+		return redirect(url_for('welcome'))
 
-# 	    # validate the received values
-# 	    if _name and _email and _password:
-# 	        return json.dumps({'html':'<span>All fields good !!</span>'})
-# 	    else:
-# 	        return json.dumps({'html':'<span>Enter the required fields</span>'})
+@app.route('/welcome')
+def welcome():
+	return render_template('welcome.html', firstName = session['FName'])
 
-# @app.route("/Authenticate")
-# def Authenticate():
-#     username = request.args.get('UserName')
-#     password = request.args.get('Password')
-#     cursor = mysql.connect().cursor()
-#     cursor.execute("SELECT * from member where Username='" + username + "' and Password='" + password + "'")
-#     data = cursor.fetchone()
-#     if data is None:
-#      return "Username or Password is wrong"
-#     else:
-#      return str("Logged in successfully" + str(data))
-    #do a check if admin
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
 	if request.method == 'GET':
 		return render_template('signup.html')
 	elif request.method == 'POST':
-		print(str(request.args))
 		firstName = request.values.get('inputFirstName')
 		lastName = request.values.get('inputLastName')
 		email = request.values.get('inputEmail')
@@ -90,42 +77,51 @@ def signup():
 		discountCode = request.values.get('discountCode')
 		password = request.values.get('inputPassword')
 
-		# firstName = "Kate"
-		# lastName = "Middleton"
-		# email = "kate@london.uk"
-		# address = "1 Buckingham Palace"
-		# phone = "12345"
-		# driversLicense = "I-AM-ROYAL"
-		# password = "katepassword"
-		# discountCode = "wer"
+		if isValidPassword(password) == False:
+			return render_template('signup.html', errorMessage="Invalid password. Please enter a password between 6 to 64 characters in length.")
 
-
-		#todo: check that password is valid, otherwise ask to try again? somehow?
-
-		#todo: make "discount code" field optional
+		if phone.isdigit() == False:
+			return render_template('signup.html', errorMessage="Invalid phone number. Phone number should contain only digits")
 
 		sql = "SELECT * from member where email=%s"
-
 		cursor.execute(sql, (email))
 		data = cursor.fetchone() 
 
-
 		if data != None:
-			return "This email is already registered for kingston carshare. Please sign in or enter a new email."
+			return render_template('signup.html', errorMessage="This email is already registered for kingston carshare. Please sign in or enter a new email.")
 		else:
-			newMemberID = createNewMemberID()
+			# set cookies for email and first name
+			session['email'] = email
+			session['FName'] = firstName
+
+			#sql command to insert new member into database
+			newMemberID = generateNewMemberID()
 			monthlyMemberFee = assignMonthlyMemberFee(discountCode)
 			isAdmin = checkIfAdmin(discountCode) #0 is false
 			sql = "INSERT INTO member VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 			cursor.execute(sql, (newMemberID, firstName, lastName, address, phone, email, driversLicense, monthlyMemberFee, password, isAdmin))
 			conn.commit()
-			return str("Signed up successfully? Check db")
+			return redirect(url_for('welcome'))
 	    #do a check if admin
 
-#todo: add checks for valid address and phone number etc
+def isValidPassword(password):
+	if len(password) <= 5 or len(password) >=65:
+		return False
+	else:
+		return True
 
-def createNewMemberID():
-	return "1000001" #todo: randomize this!!
+# not best way to this, make more efficient if time permits
+def generateNewMemberID():
+	memberID = 1000000
+	data = "not null"
+
+	while data != None:
+		memberID += 1
+		sql = "SELECT * from member where memberID=%s"
+		cursor.execute(sql, (str(memberID)))
+		data = cursor.fetchone() 
+
+	return str(memberID)
 
 def checkIfAdmin(discountCode):
 	if discountCode == "makeMeAdmin":
@@ -139,6 +135,12 @@ def assignMonthlyMemberFee(discountCode):
 		return "55"
 	else:
 		return "75"
+
+@app.route('/logout')
+def logout():
+    # remove the email from the session if it's there
+    session.pop('email', None)
+    return redirect(url_for('homepage'))
 
 # @app.route('/showEmployee')
 # def db():

@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% set active_page = "signin" %}
+ 
+{% block content %}
+
+      <div class="jumbotron">
+        <h1>Sign in</h1>
+        <form class="form-signin" action="/signin" method="post">
+
+        <h3> {{ errorMessage }}</h3>
+
+        <label for="inputEmail" class="sr-only">Email</label>
+        <input type="text" name="inputEmail" class="form-control" placeholder="Email" value="{{request.form['inputEmail']}}" required autofocus>
+
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" name="inputPassword" class="form-control" placeholder="Password" value="{{request.form['inputPassword']}}" required>
+         
+        <input type="submit" class="btn btn-lg btn-primary btn-block" value="Sign in!">
+      </form>
+      </div>
+
+{% endblock %}
+ 

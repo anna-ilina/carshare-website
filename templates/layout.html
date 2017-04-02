@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Kingston Carshare</title>
+ 
+    
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+    <link href="../static/signup.css" rel="stylesheet">
+    
+  </head>
+ 
+  <body>
+ 
+    <div class="container">
+      <div class="header">
+        <nav>
+          <ul class="nav nav-pills pull-right">
+            <li role="presentation"{% if active_page == "homepage" %}class="active"{% endif %}><a href="homepage">Home</a></li>
+            <li role="presentation"{% if active_page == "signin" %}class="active"{% endif %}><a href="signin">Sign In</a></li>
+            <li role="presentation"{% if active_page == "signup" %}class="active"{% endif %}><a href="signup">Sign Up</a></li>
+          </ul>
+        </nav>
+        <h3 class="text-muted">Kingston Car Share</h3>
+      </div>
+
+      {% block content %}{% endblock %} 
+
+
+       
+ 
+      <footer class="footer">
+        <p>&copy; Company 2015</p>
+      </footer>
+ 
+    </div>
+  </body>
+</html>
