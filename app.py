@@ -163,6 +163,100 @@ def logout():
     session.pop('email', None)
     return redirect(url_for('homepage'))
 
+@app.route('/reserve', methods=['GET', 'POST'])
+def reservationPage():
+        if request.method == 'GET':
+		return render_template('reservation.html')
+	elif request.method == 'POST':
+		print(str(request.args))
+		VIN = request.values.get('inputVIN')
+		startingDay = request.values.get('inputDay')
+		numberOfDays = request.values.get('inputNumDays')
+		userID = request.values.get('inputID')
+                errorFlag = False
+
+		if isCar == False:
+                        errorFlag = True
+		elif isReserved(startingDay,numberOfDays,VIN) == True:
+                        errorFlag = True
+                elif isUser == False:
+                        errorFlag = True                        
+
+
+
+
+		if errorFlag == False:
+			newReservationID = createNewReservationID()
+			newEntryCode = createNewEntryCode()
+			sql = "INSERT INTO reservations VALUES (%s, %s, %s, %s, %s, %s)"
+			cursor.execute(sql, (newReservationID, userID, VIN, startingDay, newEntryCode, numberOfDays))
+			conn.commit()
+			return str("Reservation complete? Check db")
+	    #do a check if admin
+
+
+def createNewReservationID():
+        notRandom = True
+        while notRandom:
+                randomInt = randint(1,10000)
+                sql = "SELECT reservationID FROM reservations WHERE reservationID=%s"
+                cursor.execute(sql, (randomInt))
+                data = cursor.fetchone()
+                print data
+                if data == None:
+                        notRandom = False
+        return randomInt
+
+#AlterToRandomCharactersIfTimePermits
+def createNewEntryCode():
+        notRandom = True
+        while notRandom:
+                randomInt = randint(1,10000)
+                sql = "SELECT reservationID FROM reservations WHERE reservationID=%s"
+                cursor.execute(sql, (randomInt))
+                data = cursor.fetchone()
+                print data
+                if data == None:
+                        notRandom = False
+        return randomInt	
+
+def isReserved(startDate,numDays,VIN):
+        sql = "SELECT VIN FROM reservations WHERE %s > DATEDIFF(%s,reservations.rentalDate) AND DATEDIFF(%s,reservations.rentalDate) > 0 AND VIN=%s"
+        cursor.execute(sql, (numDays, startDate, startDate, VIN))
+        data = cursor.fetchone()
+        if data != None:
+                return True
+        else:
+                return False
+
+def isCar(VIN):
+        sql = "SELECT vin FROM car WHERE vin=%s"
+        cursor.execute(sql, (VIN))
+        data = cursor.fetchone()
+        if data != None:
+                return True
+        else:
+                return False
+
+def isUser(ID):
+        sql = "SELECT memberID FROM member WHERE memberID=%s"
+        cursor.execute(sql, (ID))
+        data = cursor.fetchone()
+        if data != None:
+                return True
+        else:
+                return False
+
+@app.route('/locations', methods=['GET','POST'])
+def locationsPage():
+        if request.method == 'GET':
+                sql = "SELECT parkingAddress FROM parking_locations"
+                cursor.execute(sql)
+                Addresses = cursor.fetchall()
+                print Addresses
+                return render_template('locations2.html', theThing=Addresses)
+        elif request.method == 'POST':
+
 # @app.route('/showEmployee')
 # def db():
 #     db = MySQLdb.connect("localhost","myusername","mypassword","mydbname" )
