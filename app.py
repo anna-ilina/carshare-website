@@ -47,21 +47,30 @@ def signin():
 		email = request.values.get('inputEmail')
 		password = request.values.get('inputPassword')
 
-		sql = "SELECT FName from member where email=%s and password=%s"
+		sql = "SELECT FName, isAdmin from member where email=%s and password=%s"
 		cursor.execute(sql, (email, password))
 		data = cursor.fetchone() 
 
 		if data == None:
 			return render_template('signin.html', errorMessage="Username or password incorrect. Please try again.")
 		else:
+			# set cookies for email and first name and admin
 			session['email'] = email
 			session['FName'] = data[0]
-		return redirect(url_for('welcome'))
+			session['isAdmin'] = data[1]
 
-@app.route('/welcome')
-def welcome():
-	return render_template('welcome.html', firstName = session['FName'])
+		if session['isAdmin'] == 0:
+			return redirect(url_for('welcome_user'))
+		else:
+			return redirect(url_for('welcome_admin'))
 
+@app.route('/welcome_user')
+def welcome_user():
+	return render_template('welcome_user.html', firstName = session['FName'])
+
+@app.route('/welcome_admin')
+def welcome_admin():
+	return render_template('welcome_admin.html', firstName = session['FName'])
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -74,7 +83,7 @@ def signup():
 		address = request.values.get('inputAddress')
 		phone = request.values.get('inputPhone')
 		driversLicense = request.values.get('inputDriversLicense')
-		discountCode = request.values.get('discountCode')
+		discountCode = request.values.get('inputDiscountCode')
 		password = request.values.get('inputPassword')
 
 		if isValidPassword(password) == False:
@@ -90,19 +99,26 @@ def signup():
 		if data != None:
 			return render_template('signup.html', errorMessage="This email is already registered for kingston carshare. Please sign in or enter a new email.")
 		else:
-			# set cookies for email and first name
-			session['email'] = email
-			session['FName'] = firstName
-
-			#sql command to insert new member into database
+			
 			newMemberID = generateNewMemberID()
 			monthlyMemberFee = assignMonthlyMemberFee(discountCode)
 			isAdmin = checkIfAdmin(discountCode) #0 is false
+
+			# set cookies for email and first name and admin
+			session['email'] = email
+			session['FName'] = firstName
+			session['isAdmin'] = isAdmin
+
+			#sql command to insert new member into database
 			sql = "INSERT INTO member VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 			cursor.execute(sql, (newMemberID, firstName, lastName, address, phone, email, driversLicense, monthlyMemberFee, password, isAdmin))
 			conn.commit()
-			return redirect(url_for('welcome'))
-	    #do a check if admin
+			
+		if session['isAdmin'] == 0:
+			return redirect(url_for('welcome_user'))
+		else:
+			return redirect(url_for('welcome_admin'))
+
 
 def isValidPassword(password):
 	if len(password) <= 5 or len(password) >=65:
@@ -124,13 +140,16 @@ def generateNewMemberID():
 	return str(memberID)
 
 def checkIfAdmin(discountCode):
-	if discountCode == "makeMeAdmin":
-		return "1"
+	if discountCode != None:
+		discountCode = discountCode.upper() # discount code not case sensitive
+	if discountCode == "MAKEMEADMIN":
+		return 1
 	else:
-		return "0"
+		return 0
 
 def assignMonthlyMemberFee(discountCode):
-	#todo: have a field where they can enter a discount code ("20-OFF"), use here
+	if discountCode != None:
+		discountCode = discountCode.upper()
 	if discountCode == "20-OFF":
 		return "55"
 	else:
