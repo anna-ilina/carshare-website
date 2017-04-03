@@ -13,8 +13,10 @@
     
   </head>
  
-  <body>
+  <body background="{{ url_for('static', filename='images/car_on_road.png') }}">
 
+
+    <!--<div class="container" background="{{ url_for('static', filename='images/car_on_road.png') }}">-->
     <div class="container">
       <div class="header">
         <nav>
@@ -28,9 +30,9 @@
             {% endif %}
           </ul>
         </nav>
-        <h3 class="text-muted">Kingston Car Share</h3>
+        <h2 style="color:white;font-weight:bold">Kingston Car Share</h2>
         {% if firstName != None %} 
-          <em style="color:grey">  You are signed in as {{ firstName }}  <br />  </em> 
+          <em style="color:white">  You are signed in as {{ firstName }}  <br />  </em> 
           <!--<a href="/logout">Sign out</a>-->
         {% endif %}
       </div>
@@ -40,7 +42,7 @@
        
  
       <footer class="footer">
-        <p>&copy; Company 2015</p>
+        <p style="color:white">&copy; Chris Dean and Anna Ilina 2017</p>
       </footer>
  
     </div>
