@@ -283,7 +283,19 @@ def pickup_dropoff():
 
 @app.route('/member/rental_history')
 def rental_history():
-	return render_template('rental_history.html', firstName = session['FName'])
+	print(session['email'])
+	sql = "SELECT memberID FROM member WHERE email=\"" + session['email'] + "\""
+	print(sql)
+	cursor.execute(sql)
+	memberID = cursor.fetchone()[0]
+	print(memberID)
+
+
+	sql = "SELECT * FROM member_rental_history WHERE memberID=" + memberID
+	cursor.execute(sql)
+	rentals = cursor.fetchall()
+
+	return render_template('rental_history.html', firstName = session['FName'], rentals=rentals)
 
 @app.route('/admin/comments')
 def comments_admin():

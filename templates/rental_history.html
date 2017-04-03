@@ -6,9 +6,49 @@
       <div class="jumbotron">
         <h1>Your rental history</h1>
 
-        *this page is just a filler for now*
-        <br><br>
-        Show member's rental history.
+
+        <!--
+            {% for rental in rentals %}
+                {{rental[0]}}, {{rental[1]}}, {{rental[2]}}, {{rental[3]}}, {{rental[4]}}, {{rental[5]}}<br> <br> 
+            {% endfor %}
+        -->
+
+
+        {% if rentals == () %}
+
+            <br>
+            You have not made any rentals with us yet.
+
+        {% else %}
+
+
+        <table class="table table-bordered">
+
+
+            <thead>
+                <tr>
+                    <th>reservation ID</th>
+                    <th>member ID</th>
+                    <th>VIN</th>
+                    <th>rental date</th>
+                    <th>number of days</th>
+                </tr>
+            </thead>
+
+            {% for rental in rentals %}
+                <tr>
+                    <td style="text-align:left">{{rental[0]}}</td>
+                    <td style="text-align:left">{{rental[1]}}</td>
+                    <td style="text-align:left">{{rental[2]}}</td>
+                    <td style="text-align:left">{{rental[3]}}</td>
+                    <td style="text-align:left">{{rental[5]}}</td>
+                </tr>        
+            {% endfor %}
+
+            {% endif %}
+
+        </table>
+
 
       </div>
 
