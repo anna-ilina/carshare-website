@@ -256,6 +256,7 @@ def locationsPage():
                 print Addresses
                 return render_template('locations2.html', theThing=Addresses)
         elif request.method == 'POST':
+        	return
 
 # @app.route('/showEmployee')
 # def db():
