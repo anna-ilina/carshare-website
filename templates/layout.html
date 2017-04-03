@@ -19,17 +19,19 @@
       <div class="header">
         <nav>
           <ul class="nav nav-pills pull-right">
-            <li role="presentation"{% if active_page == "homepage" %}class="active"{% endif %}><a href="/homepage">Home</a></li>
+            <li role="presentation"{% if active_page == "homepage" or active_page == "welcome_user" or active_page == "welcome_admin" %}class="active"{% endif %}><a href="/homepage">Home</a></li>
             {% if firstName == None %} 
               <li role="presentation"{% if active_page == "signin" %}class="active"{% endif %}><a href="/signin">Sign In</a></li>
               <li role="presentation"{% if active_page == "signup" %}class="active"{% endif %}><a href="/signup">Sign Up</a></li>
+            {% else %}
+              <li role="presentation"><a href="/logout">Sign Out</a></li>
             {% endif %}
           </ul>
         </nav>
         <h3 class="text-muted">Kingston Car Share</h3>
         {% if firstName != None %} 
           <em style="color:grey">  You are signed in as {{ firstName }}  <br />  </em> 
-          <a href="/logout">Sign out</a>
+          <!--<a href="/logout">Sign out</a>-->
         {% endif %}
       </div>
 
