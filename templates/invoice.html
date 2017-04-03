@@ -4,15 +4,23 @@
 {% block content %}
 
       <div class="jumbotron">
+	  
+		<h3> {{ invoiceResult }}</h3>
+	  
         <h1>Generate invoice</h1>
 
-        *this page is just a filler for now*
-        <br><br>
-        1) Generate a monthly invoice for a member
-
-
+        <h3>Select a member!</h3>
+		<form class="form-getInvoice" action="/admin/invoice" method="post">
+		
+		<form>
+		{% for places in theThing %}			
+			<input type="radio" name="selected" value={{places[0]}}> {{places[0]}}<br>
+		{% endfor %}
+		
+		<input type="submit" class="btn btn-lg btn-primary btn-block" value="Generate Invoice!">
+		</form>
       </div>
-
+	</form>
 
 
 

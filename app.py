@@ -292,9 +292,24 @@ def car_history():
 def add_car():
 	return render_template('add_car.html')
 
-@app.route('/admin/invoice')
+@app.route('/admin/invoice', methods=['GET','POST'])
 def invoice():
-	return render_template('invoice.html')
+        Members = False
+	if request.method == 'GET':
+                sql = "SELECT memberID FROM member"
+                cursor.execute(sql)
+                Members = cursor.fetchall()
+                return render_template('invoice.html', theThing=Members)
+        elif request.method == 'POST':
+                sql = "SELECT memberID FROM member"
+                cursor.execute(sql)
+                Members = cursor.fetchall()
+                fuckery = request.values.get('selected')
+                sql = "SELECT monthlyMemberFee FROM member WHERE memberID=%s"
+                cursor.execute(sql, fuckery)
+                data = cursor.fetchone()
+                returnSentence = "User " + fuckery + "'s monthly invoice totals " + str(data[0]) + " dollars"
+               	return render_template('invoice.html', invoiceResult=returnSentence, theThing=Members)
 
 # @app.route('/showEmployee')
 # def db():
