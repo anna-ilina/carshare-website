@@ -8,25 +8,42 @@
 
         <div class = "row">
 <!--<style>.img-responsive { height: 100px; width: auto; }</style>-->
-
-
+          <!-- View parking lots button -->
           <div class="col-xs-6">
             <a href = "locations" class="btn btn-default">
               <img src="{{ url_for('static', filename='images/parking_lot.png') }}" class="img-responsive" alt="Responsive image">
               View parking lots
             </a>
           </div>
-
+          <!-- Make reservations button -->
           <div class="col-xs-6">
             <a href = "reserve" class="btn btn-default">
               <img src="{{ url_for('static', filename='images/car_on_road.png') }}" class="img-responsive" alt="Responsive image">
               Make a reservation
             </a>
           </div>
-
-
         </div>
 
+        <div class = "row">
+          <!-- Pick up / drop off car button -->
+          <div class="col-xs-6">
+            <a href = "pickup_dropoff" class="btn btn-default">
+              <img src="{{ url_for('static', filename='images/car_keys.png') }}" class="img-responsive" alt="Responsive image">
+              Pick-up or drop-off car
+            </a>
+          </div>
+          <!-- Show rental history button -->
+          <div class="col-xs-6">
+            <a href = "rental_history" class="btn btn-default">
+              <img src="{{ url_for('static', filename='images/clock_calendar.png') }}" class="img-responsive" alt="Responsive image">
+              Show rental history
+            </a>
+          </div>
+        </div>
+
+
+
+        <!-- below code doesn't work? -->
         <div class="img" style="background-image:url('https://s-media-cache-ak0.pinimg.com/originals/e2/9f/67/e29f678e682b03308030b9b290df25c5.jpg');"></div>
 
         <!--<!<img src="{{ url_for('static', filename='images/car_on_road_01.jpg') }}" alt="car" height="42" width="42">-->

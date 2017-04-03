@@ -258,6 +258,15 @@ def locationsPage():
         elif request.method == 'POST':
         	return
 
+@app.route('/pickup_dropoff')
+def pickup_dropoff():
+	return render_template('pickup_dropoff.html')
+
+@app.route('/rental_history')
+def rental_history():
+	return render_template('rental_history.html')
+
+
 # @app.route('/showEmployee')
 # def db():
 #     db = MySQLdb.connect("localhost","myusername","mypassword","mydbname" )
