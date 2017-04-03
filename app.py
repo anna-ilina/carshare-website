@@ -60,19 +60,25 @@ def signin():
 			session['isAdmin'] = data[1]
 
 		if session['isAdmin'] == 0:
-			return redirect(url_for('welcome_user'))
+			return redirect(url_for('welcome_member'))
 		else:
 			return redirect(url_for('welcome_admin'))
 
 
 
-@app.route('/welcome_user')
-def welcome_user():
-	return render_template('welcome_user.html', firstName = session['FName'])
+@app.route('/member/welcome')
+def welcome_member():
+	if session['isAdmin'] == 0:
+		return render_template('welcome_member.html', firstName = session['FName'])
+	else:
+		return render_template('welcome_admin.html', firstName = session['FName'])
 
-@app.route('/welcome_admin')
+@app.route('/admin/welcome')
 def welcome_admin():
-	return render_template('welcome_admin.html', firstName = session['FName'])
+	if session['isAdmin'] == 0:
+		return render_template('welcome_member.html', firstName = session['FName'])
+	else:
+		return render_template('welcome_admin.html', firstName = session['FName'])
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -163,7 +169,7 @@ def logout():
     session.pop('email', None)
     return redirect(url_for('homepage'))
 
-@app.route('/reserve', methods=['GET', 'POST'])
+@app.route('/member/reserve', methods=['GET', 'POST'])
 def reservationPage():
         if request.method == 'GET':
 		return render_template('reservation.html')
@@ -247,7 +253,7 @@ def isUser(ID):
         else:
                 return False
 
-@app.route('/locations', methods=['GET','POST'])
+@app.route('/member/locations', methods=['GET','POST'])
 def locationsPage():
         if request.method == 'GET':
                 sql = "SELECT parkingAddress FROM parking_locations"
@@ -258,14 +264,37 @@ def locationsPage():
         elif request.method == 'POST':
         	return
 
-@app.route('/pickup_dropoff')
+@app.route('/member/pickup_dropoff')
 def pickup_dropoff():
 	return render_template('pickup_dropoff.html')
 
-@app.route('/rental_history')
+@app.route('/member/rental_history')
 def rental_history():
 	return render_template('rental_history.html')
 
+@app.route('/admin/comments')
+def comments_admin():
+	return render_template('comments_admin.html')
+
+@app.route('/admin/reservations')
+def reservations_admin():
+	return render_template('reservations_admin.html')
+
+@app.route('/admin/cars')
+def cars_admin():
+	return render_template('cars_admin.html')
+
+@app.route('/admin/car_history')
+def car_history():
+	return render_template('car_history.html')
+
+@app.route('/admin/add_car')
+def add_car():
+	return render_template('add_car.html')
+
+@app.route('/admin/invoice')
+def invoice():
+	return render_template('invoice.html')
 
 # @app.route('/showEmployee')
 # def db():
