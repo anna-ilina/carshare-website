@@ -26,7 +26,10 @@ cursor = conn.cursor()
 
 @app.route("/") # when someone visits slash http://localhost:5000/ on your webpage, run this method
 def hello():
-	return redirect(url_for('homepage'))
+    session['email'] = None
+    session['FName'] = None
+    session['isAdmin'] = None
+    return redirect(url_for('homepage'))
 
 # @app.route("/index/") # when someone visits http://localhost:5000/index/, run this method
 # @app.route("/index/<name>")
@@ -37,12 +40,17 @@ def hello():
 
 @app.route("/homepage") # when someone visits slash http://localhost:5000/ on your webpage, run this method
 def homepage():
-	return render_template("index_homepage.html")
+	if session['email'] == None:
+		return render_template("index_homepage.html", firstName = None)
+	elif session['isAdmin'] == 1:
+		return redirect(url_for("welcome_admin"))
+	elif session['isAdmin'] == 0:
+		return redirect(url_for("welcome_member"))
 
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
 	if request.method == 'GET':
-		return render_template('signin.html')
+		return render_template('signin.html', firstName = None)
 	elif request.method == 'POST':
 		email = request.values.get('inputEmail')
 		password = request.values.get('inputPassword')
@@ -52,7 +60,7 @@ def signin():
 		data = cursor.fetchone() 
 
 		if data == None:
-			return render_template('signin.html', errorMessage="Username or password incorrect. Please try again.")
+			return render_template('signin.html', errorMessage="Username or password incorrect. Please try again.", firstName = None)
 		else:
 			# set cookies for email and first name and admin
 			session['email'] = email
@@ -83,7 +91,7 @@ def welcome_admin():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
 	if request.method == 'GET':
-		return render_template('signup.html')
+		return render_template('signup.html', firstName = None)
 	elif request.method == 'POST':
 		firstName = request.values.get('inputFirstName')
 		lastName = request.values.get('inputLastName')
@@ -95,17 +103,17 @@ def signup():
 		password = request.values.get('inputPassword')
 
 		if isValidPassword(password) == False:
-			return render_template('signup.html', errorMessage="Invalid password. Please enter a password between 6 to 64 characters in length.")
+			return render_template('signup.html', errorMessage="Invalid password. Please enter a password between 6 to 64 characters in length.", firstName = None)
 
 		if phone.isdigit() == False:
-			return render_template('signup.html', errorMessage="Invalid phone number. Phone number should contain only digits")
+			return render_template('signup.html', errorMessage="Invalid phone number. Phone number should contain only digits", firstName = None)
 
 		sql = "SELECT * from member where email=%s"
 		cursor.execute(sql, (email))
 		data = cursor.fetchone() 
 
 		if data != None:
-			return render_template('signup.html', errorMessage="This email is already registered for kingston carshare. Please sign in or enter a new email.")
+			return render_template('signup.html', errorMessage="This email is already registered for kingston carshare. Please sign in or enter a new email.", firstName = None)
 		else:
 			
 			newMemberID = generateNewMemberID()
@@ -166,13 +174,18 @@ def assignMonthlyMemberFee(discountCode):
 @app.route('/logout')
 def logout():
     # remove the email from the session if it's there
-    session.pop('email', None)
+    # session.pop('email', None)
+    # session.pop('FName', None)
+    # session.pop('isAdmin', None)
+    session['email'] = None
+    session['FName'] = None
+    session['isAdmin'] = None
     return redirect(url_for('homepage'))
 
 @app.route('/member/reserve', methods=['GET', 'POST'])
 def reservationPage():
         if request.method == 'GET':
-		return render_template('reservation.html')
+		return render_template('reservation.html', firstName = session['FName'])
 	elif request.method == 'POST':
 		print(str(request.args))
 		VIN = request.values.get('inputVIN')
@@ -260,37 +273,37 @@ def locationsPage():
                 cursor.execute(sql)
                 Addresses = cursor.fetchall()
                 print Addresses
-                return render_template('locations2.html', theThing=Addresses)
+                return render_template('locations2.html', theThing=Addresses, firstName = session['FName'])
         elif request.method == 'POST':
         	return
 
 @app.route('/member/pickup_dropoff')
 def pickup_dropoff():
-	return render_template('pickup_dropoff.html')
+	return render_template('pickup_dropoff.html', firstName = session['FName'])
 
 @app.route('/member/rental_history')
 def rental_history():
-	return render_template('rental_history.html')
+	return render_template('rental_history.html', firstName = session['FName'])
 
 @app.route('/admin/comments')
 def comments_admin():
-	return render_template('comments_admin.html')
+	return render_template('comments_admin.html', firstName = session['FName'])
 
 @app.route('/admin/reservations')
 def reservations_admin():
-	return render_template('reservations_admin.html')
+	return render_template('reservations_admin.html', firstName = session['FName'])
 
 @app.route('/admin/cars')
 def cars_admin():
-	return render_template('cars_admin.html')
+	return render_template('cars_admin.html', firstName = session['FName'])
 
 @app.route('/admin/car_history')
 def car_history():
-	return render_template('car_history.html')
+	return render_template('car_history.html', firstName = session['FName'])
 
 @app.route('/admin/add_car')
 def add_car():
-	return render_template('add_car.html')
+	return render_template('add_car.html', firstName = session['FName'])
 
 @app.route('/admin/invoice', methods=['GET','POST'])
 def invoice():
@@ -299,7 +312,7 @@ def invoice():
                 sql = "SELECT memberID FROM member"
                 cursor.execute(sql)
                 Members = cursor.fetchall()
-                return render_template('invoice.html', theThing=Members)
+                return render_template('invoice.html', theThing=Members, firstName = session['FName'])
         elif request.method == 'POST':
                 sql = "SELECT memberID FROM member"
                 cursor.execute(sql)
@@ -309,7 +322,7 @@ def invoice():
                 cursor.execute(sql, fuckery)
                 data = cursor.fetchone()
                 returnSentence = "User " + fuckery + "'s monthly invoice totals " + str(data[0]) + " dollars"
-               	return render_template('invoice.html', invoiceResult=returnSentence, theThing=Members)
+               	return render_template('invoice.html', invoiceResult=returnSentence, theThing=Members, firstName = session['FName'])
 
 # @app.route('/showEmployee')
 # def db():
