@@ -6,21 +6,90 @@
       <div class="jumbotron">
         <h1>Pick-up or drop-off car</h1>
 
-        *this page is just a filler for now*
+        {% if reservationsPickup == () or reservationsPickup == [] %}
 
-        <h2>Record pick-up car</h2>
-        List member's current reservations, add button to say you have picked up the car.
-        (record the time, odometer reading, car status)
+        <br><br>
+        <h2>You have no pickups booked today.</h2>
 
-        <h2>Record drop-off car</h2>
-        List member's currently signed out cars, add button to say you have dropped off a car.
-        (record the time, odometer reading, car status)
+        {% else %}
 
-        Also have a field to provide feedback on the returned rental.
-        (rating, comment)
+        <h2>Cars available for pickup:</h2>
 
-      </div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>rental start date</th>
+                    <th>reservationID</th>
+                    <th>VIN</th>
+                    <th>rental duration (days)</th>
+                </tr>
+            </thead>
+            {% for reservation in reservationsPickup %}
+                <tr>
+                    <td style="text-align:left">{{reservation[0]}}</td>
+                    <td style="text-align:left">{{reservation[1]}}</td>
+                    <td style="text-align:left">{{reservation[2]}}</td>
+                    <td style="text-align:left">{{reservation[3]}}</td>
+                </tr>        
+            {% endfor %}
+        </table>
+        {% endif %}
 
+
+        {% if carsForDropoff == () or carsForDropoff == [] %}
+
+        <br><br>
+        <h2>You have no cars available to drop off today.</h2>
+
+        {% else %}
+        <h2>Cars available for dropoff:</h2>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>pickup time</th>
+                    <th>reservationID</th>
+                    <th>VIN</th>
+                    <th>pickup odometer reading</th>
+                    <th>pickup status</th>
+                </tr>
+            </thead>
+            {% for car in carsForDropoff %}
+                <tr>
+                    <td style="text-align:left">{{car[6]}}</td>
+                    <td style="text-align:left">{{car[0]}}</td>
+                    <td style="text-align:left">{{car[8]}}</td>
+                    <td style="text-align:left">{{car[2]}}</td>
+                    <td style="text-align:left">{{car[4]}}</td>
+                </tr>        
+            {% endfor %}
+        </table>
+        {% endif %}
+
+    {% if reservationsPickup != () and reservationsPickup != [] and carsForDropoff != () and carsForDropoff != [] %}
+    
+
+        <h5>Choose car to pick up / drop off</h5>
+        <form class="form-signin" action="/member/pickup_dropoff" method="post">
+
+        <input type="radio" name="pickup" value="pickup">pickup<br>
+        <input type="radio" name="pickup" value="dropoff">dropoff<br>
+
+        <label for="input VIN" class="sr-only">Name</label>
+        <input type="text" name="inputReservationID" class="form-control" placeholder="reservation ID" required autofocus>
+
+        <label for="odometer reading" class="sr-only">Name</label>
+        <input type="text" name="inputKm" class="form-control" placeholder="current odometer reading" required autofocus>
+
+        <label for="status on pickup" class="sr-only">Name</label>
+        <input type="text" name="inputStatus" class="form-control" placeholder="current status" required autofocus>
+
+        <!--<button id="btnSignUp" class="btn btn-lg btn-primary btn-block" type="button">Sign up</button>-->
+        <input type="submit" class="btn btn-lg btn-primary btn-block" value="Submit!">
+      </form> 
+    {% endif %}
+
+    </div>
 
 
 

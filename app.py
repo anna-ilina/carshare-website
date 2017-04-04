@@ -6,6 +6,8 @@
 
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask.ext.mysql import MySQL
+from datetime import datetime, date
+import random
 app = Flask(__name__)
 mysql = MySQL()
 app.secret_key = 'SUSHI'
@@ -184,7 +186,6 @@ def logout():
     return redirect(url_for('homepage'))
 
 
-
 @app.route('/member/reserve', methods=['GET', 'POST'])
 def reservationPage():
         if request.method == 'GET':
@@ -192,6 +193,97 @@ def reservationPage():
                 session['numberOfDays'] = False
                 session['day'] = False
 		return render_template('reservation.html', firstName = session['FName'], dateSelected=session['day'] )
+
+@app.route('/member/pickup_dropoff', methods=['GET', 'POST'])
+def pickup_dropoff():
+
+
+	#get user's memberID
+	sql = "SELECT memberID FROM member WHERE email=\"" + session['email'] + "\""
+	cursor.execute(sql)
+	memberID = cursor.fetchone()[0]
+
+	if request.method == 'GET':
+		today = date.today()
+		# day = today.day
+		# month = today.month
+		# year = today.year
+
+		#get dates for all the user's reservations
+		sql = "SELECT rentalDate, reservationID, VIN, reservationNumDays FROM reservations WHERE memberID=" + memberID + " AND rentalDate=\"" + str(today) + "\""
+		cursor.execute(sql)
+		reservations = cursor.fetchall()
+
+		carsNotPickedUpYet = []
+		for res in reservations:
+			resID = res[1]
+			# car will only be in car_rental_history if it has already been picked up
+			sql = "SELECT * FROM car_rental_history WHERE reservationID=" + resID
+			cursor.execute(sql)
+			i = cursor.fetchone()
+			if i == None:
+				carsNotPickedUpYet.append(res)
+
+		carsReadyForDropoff = []
+		sql = "SELECT * FROM car_rental_history WHERE memberID=" + memberID + " AND dropOffKm=0"
+		cursor.execute(sql)
+		carsForDropoff = cursor.fetchall()
+
+		# for reservation in reservations:
+		# 	#date = datetime.strptime(str(reservation[0]), "%Y-%m-%d")
+		# 	reservationDate = str(reservation[0])
+
+		return render_template('pickup_dropoff.html', firstName = session['FName'], reservationsPickup = carsNotPickedUpYet, carsForDropoff = carsForDropoff)
+
+	elif request.method == 'POST':
+		
+		reservationID = request.values.get('inputReservationID')
+		inputKm = request.values.get('inputKm')
+		inputStatus = request.values.get('inputStatus')
+		pickup = request.values.get('pickup') == "pickup" #otherwise action is dropoff
+		currentTime = datetime.today()
+		currentTime = currentTime.strftime('%Y-%m-%d %H:%M:%S')
+
+		if pickup == True:
+			print ("submitted car for pick-up")
+
+			#sql = "UPDATE car_rental_history SET `statusOnReturn` = 'not running!' WHERE `car_rental_history`.`reservationID` = 'Reserve2345'
+			#UPDATE `car_rental_history` SET `statusOnReturn` = 'not running!', `pickUpTime` = '2017-04-03 07:00:00' WHERE `car_rental_history`.`reservationID` = 'Reserve2345'
+			
+			# sql = "UPDATE car_rental_history SET pickUpTime=%s, pickUpKm=%s, statusOnPickup=%s WHERE car_rental_history.reservationID=%s"
+			# cursor.execute(sql, (currentTime, inputKm, pickupStatus, reservationID))
+			sql = "SELECT * FROM reservations WHERE reservationID=" + reservationID
+			cursor.execute(sql)
+			res = cursor.fetchone()
+			print(res)
+			for item in res:
+				print(item)
+
+			if res != None:
+				print ("here")
+				sql = "INSERT INTO car_rental_history VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+				cursor.execute(sql, (res[0], res[1], str(inputKm), str(0), inputStatus, "", currentTime, currentTime, res[2]))
+				conn.commit()
+
+				sql = "INSERT INTO member_rental_history VALUES (%s, %s, %s, %s, %s, %s)"
+				cursor.execute(sql, (res[0], res[1], res[2], str(res[3]), res[4], res[5]))
+				conn.commit()
+
+		else: # submitted for dropoff
+			print ("car submitted for dropoff")
+
+			sql = "UPDATE car_rental_history SET dropOffTime=%s, dropOffKm=%s, statusOnReturn=%s WHERE car_rental_history.reservationID=%s"
+			cursor.execute(sql, (currentTime, inputKm, inputStatus, reservationID))
+			conn.commit()
+
+
+		return redirect(url_for('homepage'))
+
+
+@app.route('/member/reserve', methods=['GET', 'POST'])
+def reservationPage():
+	if request.method == 'GET':
+		return render_template('reservation.html', firstName = session['FName'])
 	elif request.method == 'POST':
             if session['day'] == False:
 		session['startingDay'] = request.values.get('inputDay')
@@ -224,7 +316,7 @@ def reservationPage():
 def createNewReservationID():
         notRandom = True
         while notRandom:
-                randomInt = randint(1,10000)
+                randomInt = random.randint(1,10000)
                 sql = "SELECT reservationID FROM reservations WHERE reservationID=%s"
                 cursor.execute(sql, (randomInt))
                 data = cursor.fetchone()
@@ -236,7 +328,7 @@ def createNewReservationID():
 def createNewEntryCode():
         notRandom = True
         while notRandom:
-                randomInt = randint(1,10000)
+                randomInt = random.randint(1,10000)
                 sql = "SELECT reservationID FROM reservations WHERE reservationID=%s"
                 cursor.execute(sql, (randomInt))
                 data = cursor.fetchone()
@@ -287,19 +379,15 @@ def locationsPage():
                 rentals = cursor.fetchall()
                 print whichCar
                 return render_template('locations2.html', firstName = session['FName'], locationSelected="3", rentals=rentals)
- 
-@app.route('/member/pickup_dropoff')
-def pickup_dropoff():
-	return render_template('pickup_dropoff.html', firstName = session['FName'])
 
 @app.route('/member/rental_history')
 def rental_history():
-	print(session['email'])
+	#print(session['email'])
 	sql = "SELECT memberID FROM member WHERE email=\"" + session['email'] + "\""
-	print(sql)
+	#print(sql)
 	cursor.execute(sql)
 	memberID = cursor.fetchone()[0]
-	print(memberID)
+	#print(memberID)
 
 
 	sql = "SELECT * FROM member_rental_history WHERE memberID=" + memberID
