@@ -6,9 +6,62 @@
       <div class="jumbotron">
         <h1>Reservations by day</h1>
 
-        *this page is just a filler for now*
-        <br><br>
-        8) Show all the reservations for a given day.
+        <form class="form-selectLoc" action="/admin/reservations" method="post">
+		
+		<label for="inputDay" class="sr-only">Name</label>
+        <input type="date" name="inputDay" class="form-control" placeholder="Start Day (YYYY-MM-DD)" required autofocus>
+		
+		{% if dateSelected == True %}
+		
+		<h3>Reservations on this day</h3>
+
+
+        <!--
+            {% for rental in rentals %}
+                {{rental[0]}}, {{rental[1]}}, {{rental[2]}}, {{rental[3]}}, {{rental[4]}}, {{rental[5]}}<br> <br> 
+            {% endfor %}
+        -->
+
+
+        {% if rentals == () %}
+
+            <br>
+            There are no reservations on this day yet.
+
+        {% else %}
+
+
+        <table class="table table-bordered">
+
+
+            <thead>
+                <tr>
+                    <th>reservation ID</th>
+                    <th>member ID</th>
+                    <th>VIN</th>
+                    <th>rental date</th>
+                    <th>number of days</th>
+                </tr>
+            </thead>
+
+            {% for rental in rentals %}
+                <tr>
+                    <td style="text-align:left">{{rental[0]}}</td>
+                    <td style="text-align:left">{{rental[1]}}</td>
+                    <td style="text-align:left">{{rental[2]}}</td>
+                    <td style="text-align:left">{{rental[3]}}</td>
+                    <td style="text-align:left">{{rental[5]}}</td>
+                </tr>        
+            {% endfor %}
+
+            
+
+        </table>
+
+        {% endif %}
+				
+		{% endif %}
+		<input type="submit" class="btn btn-lg btn-primary btn-block" value="Check Date!">
       </div>
 
 

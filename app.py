@@ -306,7 +306,22 @@ def reservationPage():
                 sql = "INSERT INTO reservations VALUES (%s, %s, %s, %s, %s, %s)"
                 cursor.execute(sql, (reservationID, data, carToRent, session['startingDay'], entryCode, session['numberOfDays']))
                 conn.commit()
+                sql = "SELECT monthlyMemberFee FROM member WHERE email=%s"
+                cursor.execute(sql, session['email'])
+                data1 = cursor.fetchone()[0]
+                print data1
+                sql = "SELECT carTypeID FROM car WHERE VIN=%s"
+                cursor.execute(sql, carToRent)
+                data2 = cursor.fetchone()
+                print data2
+                sql = "SELECT dailyRentalFee FROM car_type WHERE carTypeID=%s"
+                cursor.execute(sql, data2)
+                data3 = cursor.fetchone()[0]
+                sql = "UPDATE member SET monthlyMemberFee=%s WHERE email=%s"
+                updatedFee = int(data1) + int(data3)*int(session['numberOfDays'])
+                cursor.execute(sql, (updatedFee, session['email']))
                 session['day'] = "Success"
+                conn.commit()
                 return render_template('reservation.html', firstName = session['FName'], errorMessage = "Reservation Successful", dateSelected=session['day'])
 
 
@@ -374,6 +389,7 @@ def locationsPage():
                 sql = "SELECT * FROM car_rental_history WHERE VIN=%s"
                 cursor.execute(sql, whichCar)
                 rentals = cursor.fetchall()
+                print rentals
                 print whichCar
                 return render_template('locations2.html', firstName = session['FName'], locationSelected="3", rentals=rentals)
 
@@ -397,9 +413,17 @@ def rental_history():
 def comments_admin():
 	return render_template('comments_admin.html', firstName = session['FName'])
 
-@app.route('/admin/reservations')
+@app.route('/admin/reservations', methods=['GET','POST'])
 def reservations_admin():
+    if request.method == 'GET':
 	return render_template('reservations_admin.html', firstName = session['FName'])
+    if request.method == 'POST':
+        dayToCheck = request.values.get('inputDay')
+        sql = "SELECT * FROM reservations WHERE rentalDate=%s"
+        cursor.execute(sql, dayToCheck)
+        data = cursor.fetchall()
+        print data
+        return render_template('reservations_admin.html', firstName = session['FName'], dateSelected=True, rentals=data)
 
 @app.route('/admin/cars_at_location', methods=['POST'])
 def cars_at_location_admin():
@@ -468,6 +492,20 @@ def add_car():
             VIN = request.values.get('inputVIN')
 	    Type = request.values.get('inputType')
 	    Address = request.values.get('inputAddress')
+	    sql = "SELECT parkingAddress FROM parking_locations WHERE parkingAddress=%s"
+	    cursor.execute(sql, Address)
+	    data = cursor.fetchone()
+	    print data
+	    if data == None:
+                sql = "INSERT INTO parking_locations VALUES (%s, %s)"
+                cursor.execute(sql, (Address, "10"))
+                conn.commit()
+                print "FUCUSIDDASIDNASNDIAOSND"
+            sql = "SELECT carTypeID FROM car_type WHERE carTypeID=%s"
+            cursor.execute(sql, Type)
+            data = cursor.fetchone()
+            if data == None:
+                return render_template('add_car.html', firstName = session['FName'], errorMessage = "Tried to add car of invalid type. Please try again")
 	    sql = "INSERT INTO car VALUES (%s, %s, %s)"
 	    cursor.execute(sql, (VIN, Type, Address))
 	    conn.commit()
@@ -490,7 +528,7 @@ def invoice():
                 sql = "SELECT monthlyMemberFee FROM member WHERE memberID=%s"
                 cursor.execute(sql, fuckery)
                 data = cursor.fetchone()
-                returnSentence = "User " + fuckery + "'s monthly invoice totals " + str(data[0]) + " dollars"
+                returnSentence = "User " + fuckery + "'s annual invoice totals " + str(data[0]) + " dollars"
                	return render_template('invoice.html', invoiceResult=returnSentence, theThing=Members, firstName = session['FName'])
 
 # @app.route('/showEmployee')

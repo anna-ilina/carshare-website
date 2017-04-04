@@ -69,11 +69,17 @@
 
 	{% if locationSelected != "3" %}
       <div class="jumbotron">
+		{% if locationSelected == False %}
 		<h3>Select a location!</h3>
+		{% if theThing == () %}
+
+            <br>
+            This location has no cars, sorry
+
+        {% endif %}
 		<form class="form-signin" action="/member/locations" method="post">
 		
 		<form class="form-seeCars" action="/member/locations" method="post">
-		{% if locationSelected == False %}
 		<form>
 		{% for places in theThing %}			
 			<input type="radio" name="sites" value={{places[0]}}> {{places[0]}}<br>
@@ -83,11 +89,13 @@
 		{% endif %}
 		
 		{% if locationSelected == True %}
+		<h3>Select a car!</h3>
+		<form class="form-seeCars" action="/member/locations" method="post">
 		<form>
 		{% for avaliable in theLocation %}
 			<input type="radio" name="cars" value={{ avaliable[1] }}> {{ avaliable[1] }}<br>
 		{% endfor %}
-		<input type="submit" class="btn btn-lg btn-primary btn-block" value="See cars at location!">
+		<input type="submit" class="btn btn-lg btn-primary btn-block" value="See rental history of this car!">
 		</form>
 		{% endif %}
 
