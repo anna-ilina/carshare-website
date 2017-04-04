@@ -5,15 +5,87 @@
 
       <div class="jumbotron">
         <h1>Respond to members' comments</h1>
+			{% if rentals == () %}
 
-        *this page is just a filler for now*
-        <br><br>
-        9) Show all comments with no responses. Respond to a member's comment.
-        <br>
-        How will members see the response? Where will be have these responses and ratings displayed?
-      </div>
+            <br>
+            There are no reservations on this day yet.
+
+			{% else %}
 
 
+			<table class="table table-bordered">
+
+
+            <thead>
+                <tr>
+                    <th>reservation ID</th>
+                    <th>member ID</th>
+                    <th>VIN</th>
+                    <th>rental date</th>
+                    <th>number of days</th>
+                </tr>
+            </thead>
+
+            {% for rental in comments %}
+                <tr>
+                    <td style="text-align:left">{{rental[0]}}</td>
+                    <td style="text-align:left">{{rental[1]}}</td>
+                    <td style="text-align:left">{{rental[2]}}</td>
+                    <td style="text-align:left">{{rental[3]}}</td>
+                    <td style="text-align:left">{{rental[5]}}</td>
+                </tr>        
+            {% endfor %}
+
+            
+
+			</table>
+
+			{% endif %}
+			
+	        <form class="form-signin" action="/admin/comments" method="post">
+
+			<h3 style="color:red"> {{ errorMessage }}</h3>
+
+			<label for="inputComment" class="sr-only">Name</label>
+			<input type="text" name="inputComment" class="form-control" placeholder="Which comment are you responding to? (Enter its ID)" value="{{request.form['inputComment']}}"required autofocus>
+			
+			<label for="inputResponse" class="sr-only">Name</label>
+			<input type="text" name="inputResponse" class="form-control" placeholder="Write Response" value="{{request.form['inputResponse']}}"required autofocus>
+
+			<input type="submit" class="btn btn-lg btn-primary btn-block" value="Add Reply!">
+			
+			{% if adminReplies == () %}
+
+            <br>
+            You have not made any rentals with us yet.
+
+			{% else %}
+
+
+			<table class="table table-bordered">
+
+
+				<thead>
+					<tr>
+						<th>adminReplyID</th>
+						<th>commentID</th>
+						<th>comment</th>
+					</tr>
+				</thead>
+
+				{% for el in adminReplies %}
+					<tr>
+						<td style="text-align:left">{{el[0]}}</td>
+						<td style="text-align:left">{{el[1]}}</td>
+						<td style="text-align:left">{{el[2]}}</td>
+					</tr>        
+				{% endfor %}
+
+            
+
+			</table>
+
+			{% endif %}
 
 
 {% endblock %}

@@ -5,9 +5,95 @@
  
         <div class="jumbotron">
             <h1>Comments and Ratings</h1>
+			
+	        <form class="form-signin" action="/comments" method="post">
 
-            fill in here
+			<h3 style="color:red"> {{ errorMessage }}</h3>
 
+			<label for="inputComment" class="sr-only">Name</label>
+			<input type="text" name="inputComment" class="form-control" placeholder="Write Comment Here" value="{{request.form['inputComment']}}"required autofocus>
+			
+			<label for="inputRating" class="sr-only">Name</label>
+			<input type="text" name="inputRating" class="form-control" placeholder="Write Numerical Rating Here" value="{{request.form['inputRating']}}"required autofocus>
+
+			<label for="inputReservationNum" class="sr-only">Name</label>
+			<input type="text" name="inputReservationNum" class="form-control" placeholder="Reservation Number" value="{{request.form['inputReservationNum']}}" required autofocus>
+
+            
+			<input type="submit" class="btn btn-lg btn-primary btn-block" value="Leave Comment!">
+			
+			
+				{% if rentals == () %}
+
+            <br>
+            There are no comments yet.
+
+        {% else %}
+
+
+        <table class="table table-bordered">
+
+
+            <thead>
+                <tr>
+                    <th>reservation ID</th>
+                    <th>member ID</th>
+                    <th>VIN</th>
+                    <th>rental date</th>
+                    <th>number of days</th>
+                </tr>
+            </thead>
+
+            {% for rental in comments %}
+                <tr>
+                    <td style="text-align:left">{{rental[0]}}</td>
+                    <td style="text-align:left">{{rental[1]}}</td>
+                    <td style="text-align:left">{{rental[2]}}</td>
+                    <td style="text-align:left">{{rental[3]}}</td>
+                    <td style="text-align:left">{{rental[5]}}</td>
+                </tr>        
+            {% endfor %}
+
+            
+
+        </table>
+
+        {% endif %}
+		
+		{% if adminReplies == () %}
+
+            <br>
+            You have not made any rentals with us yet.
+
+			{% else %}
+
+
+			<table class="table table-bordered">
+
+
+				<thead>
+					<tr>
+						<th>adminReplyID</th>
+						<th>commentID</th>
+						<th>comment</th>
+					</tr>
+				</thead>
+
+				{% for el in adminReplies %}
+					<tr>
+						<td style="text-align:left">{{el[0]}}</td>
+						<td style="text-align:left">{{el[1]}}</td>
+						<td style="text-align:left">{{el[2]}}</td>
+					</tr>        
+				{% endfor %}
+
+            
+
+			</table>
+
+			{% endif %}
+			
+			
         </div>
  
 {% endblock %}

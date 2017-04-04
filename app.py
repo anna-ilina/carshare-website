@@ -409,9 +409,30 @@ def rental_history():
 
 	return render_template('rental_history.html', firstName = session['FName'], rentals=rentals)
 
-@app.route('/admin/comments')
+@app.route('/admin/comments', methods=['GET','POST'])
 def comments_admin():
-	return render_template('comments_admin.html', firstName = session['FName'])
+    if request.method == 'GET':
+        sql = "SELECT * FROM rental_comments"
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        sql = "SELECT * FROM admin_reply"
+        cursor.execute(sql)
+        data2 = cursor.fetchall()
+	return render_template('comments_admin.html', firstName = session['FName'], comments=data, adminReplies=data2)
+    if request.method == 'POST':
+        thingOne = request.values.get('inputComment')
+        thingTwo = request.values.get('inputResponse')
+        newID = generateAdminCommentID()
+        sql = "INSERT INTO admin_reply VALUES (%s, %s, %s)"
+        cursor.execute(sql, (newID, thingOne, thingTwo))
+        conn.commit()
+        sql = "SELECT * FROM rental_comments"
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        sql = "SELECT * FROM admin_reply"
+        cursor.execute(sql)
+        data2 = cursor.fetchall()
+	return render_template('comments_admin.html', firstName = session['FName'], comments=data, adminReplies=data2)
 
 @app.route('/admin/reservations', methods=['GET','POST'])
 def reservations_admin():
@@ -533,7 +554,62 @@ def invoice():
 
 @app.route('/comments', methods=['GET', 'POST'])
 def comments():
-	return render_template('comments.html', firstName = session['FName'])
+    if request.method == 'GET':
+        sql = "SELECT * FROM rental_comments"
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        sql = "SELECT * FROM admin_reply"
+        cursor.execute(sql)
+        data2 = cursor.fetchall()
+	return render_template('comments.html', firstName = session['FName'], comments=data, adminReplies=data2)
+    if request.method == 'POST':
+        newID = generateCommentID()
+        commentText = request.values.get('inputComment')
+        rating = request.values.get('inputRating')
+        reservationNumber = request.values.get('inputReservationNum')
+        sql = "SELECT memberID FROM member WHERE email=%s"
+        cursor.execute(sql, session['email'])
+        memID = cursor.fetchone()[0]
+        if memID == None:
+            return render_template('comments.html', errorMessage="We are sorry, please log in before leaving a comment")
+        sql = "SELECT VIN from reservations WHERE reservationID=%s"
+        cursor.execute(sql, reservationNumber)
+        vehicle = cursor.fetchone()
+        sql = "SELECT commentID FROM rental_comments WHERE reservationID=%s"
+        cursor.execute(sql, reservationNumber)
+        data = cursor.fetchone()
+        if data != None:
+            return render_template('comments.html', firstName = session['FName'], errorMessage="We are sorry, but this reservation already has a comment")
+        sql = "INSERT INTO rental_comments VALUES (%s, %s, %s, %s, %s, %s)"
+        cursor.execute(sql, (newID, memID, reservationNumber, vehicle, rating, commentText))
+        conn.commit()
+        sql = "SELECT * FROM rental_comments"
+        cursor.execute(sql)
+        data = cursor.fetchall()
+	return render_template('comments.html', firstName = session['FName'], comments=data, errorMessage="Comment posted successfully")
+
+def generateCommentID():
+        notRandom = True
+        while notRandom:
+                randomInt = random.randint(1,10000)
+                sql = "SELECT commentID FROM rental_comments WHERE commentID=%s"
+                cursor.execute(sql, (randomInt))
+                data = cursor.fetchone()
+                if data == None:
+                        notRandom = False
+        return str(randomInt)
+
+def generateAdminCommentID():
+        notRandom = True
+        while notRandom:
+                randomInt = random.randint(1,10000)
+                sql = "SELECT adminReplyID FROM admin_reply WHERE adminReplyID=%s"
+                cursor.execute(sql, (randomInt))
+                data = cursor.fetchone()
+                if data == None:
+                        notRandom = False
+        return str(randomInt)
+        
 
 # @app.route('/showEmployee')
 # def db():
