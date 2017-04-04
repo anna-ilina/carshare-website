@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% set active_page = "cars_at_location" %}
+ 
+{% block content %}
+
+      <div class="jumbotron">
+        <h1>Cars at location</h1>
+
+        <h3><b>Location:</b>   {{location}}</h3>
+
+        <br>
+
+        {% if cars == () or cars == None %}
+
+        	<h4>There are no cars at this location</h4>
+
+        {% else %}
+
+	        <h3><b>Cars:</b></h3> 
+
+            <table class="table table-bordered">
+	            <thead>
+	                <tr>
+	                    <th>VIN</th>
+	                    <th>car name</th>
+	                </tr>
+	            </thead>
+
+	        	{% for car in cars %}
+
+	        		<tr>
+
+	                    <td style="text-align:left">{{car[0]}}</td>
+	                    <td style="text-align:left">{{car[1]}}</td>
+
+                    </tr>
+
+	        	<!--<h4>{{ car[0] }} {{ car[1] }}</h4>-->
+
+	        {% endfor %}
+
+        {% endif %}
+
+
+
+      </div>
+
+
+
+
+{% endblock %}
+ 

@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% set active_page = "cars_by_km" %}
+ 
+{% block content %}
+
+      <div class="jumbotron">
+        <h1>Cars by number of rentals</h1>
+
+        <h3>Sorting cars by number of rentals, from high to low.</h3>
+
+        <br>
+
+        {% if cars == () or cars == None %}
+
+        	<h4>No cars have been rented yet.</h4>
+
+        {% else %}
+
+            <table class="table table-bordered">
+	            <thead>
+	                <tr>
+	                    <th>VIN</th>
+	                    <th>times rented</th>
+	                    <th>total days rented</th>
+	                </tr>
+	            </thead>
+
+	        	{% for car in cars %}
+
+	        		<tr>
+	                    <td style="text-align:left">{{car[0]}}</td>
+	                    <td style="text-align:left">{{car[1]}}</td>
+	                    <td style="text-align:left">{{car[2]}}</td>
+                    </tr>
+
+	        	<!--<h4>{{ car[0] }} {{ car[1] }}</h4>-->
+
+	        {% endfor %}
+        {% endif %}
+      </div>
+
+{% endblock %}
+ 

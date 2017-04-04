@@ -401,9 +401,50 @@ def comments_admin():
 def reservations_admin():
 	return render_template('reservations_admin.html', firstName = session['FName'])
 
-@app.route('/admin/cars')
+@app.route('/admin/cars_at_location', methods=['POST'])
+def cars_at_location_admin():
+	location = request.values.get("site")
+	sql = "SELECT vin, carTypeID FROM car WHERE parkingAddress=\"" + location + "\""
+	cursor.execute(sql)
+	cars = cursor.fetchall()
+	return render_template('cars_at_location.html', firstName = session['FName'], cars=cars, location=location)
+
+@app.route('/admin/cars_by_km', methods=['POST'])
+def cars_by_km_admin():
+	minKm = request.values.get("minKm")
+	maxKm = request.values.get("maxKm")
+	sql = "SELECT vin, dropOffKm, statusOnReturn FROM car_rental_history WHERE dropOffKm>=%s AND dropOffKm<=%s ORDER BY dropOffKm"
+	cursor.execute(sql, (minKm, maxKm))
+	cars = cursor.fetchall()
+	return render_template('cars_by_km.html', firstName = session['FName'], cars=cars, minKm=minKm, maxKm=maxKm)
+
+@app.route('/admin/cars_by_rentals', methods=['POST'])
+def cars_by_rentals_admin():
+	sql = "SELECT VIN, COUNT(VIN) AS timesRented, SUM(reservationNumDays) AS totalDaysRented FROM reservations GROUP BY VIN"
+	cursor.execute(sql)
+	cars = cursor.fetchall()
+	return render_template('cars_by_rentals.html', firstName = session['FName'], cars=cars)
+
+@app.route('/admin/cars_by_damage', methods=['POST'])
+def cars_by_damage_admin():
+	sql = "SELECT VIN, statusOnReturn, MAX(dropOffTime) AS latestRental FROM car_rental_history WHERE statusOnReturn != \"good\" AND statusOnReturn != \"okay\" GROUP BY VIN"
+	cursor.execute(sql)
+	cars = cursor.fetchall()
+	return render_template('cars_by_damage.html', firstName = session['FName'], cars=cars)
+
+@app.route('/admin/cars', methods=['GET', 'POST'])
 def cars_admin():
-	return render_template('cars_admin.html', firstName = session['FName'])
+	if request.method == 'GET':
+		#session['ch'] = False
+		sql = "SELECT parkingAddress FROM parking_locations"
+		cursor.execute(sql)
+		Addresses = cursor.fetchall()
+		return render_template('cars_admin.html', locations=Addresses, locationSelected=False, firstName = session['FName'])
+	elif request.method == 'POST':
+		return render_template('cars_admin.html', locationSelected=True, firstName = session['FName'])
+
+	#view all cars
+	#return render_template('cars_admin.html', firstName = session['FName'], locationSelected="False")
 
 @app.route('/admin/car_history', methods=['GET','POST'])
 def car_history():

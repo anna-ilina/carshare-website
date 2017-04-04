@@ -4,21 +4,41 @@
 {% block content %}
 
       <div class="jumbotron">
-        <h1>View cars</h1>
+        <h1>Options to view cars</h1>
 
-        *this page is just a filler for now*
-        
-        <br><br>
-        Add options to:
-        <br><br>
-        4) For a given location, show all cars currently available in that location and
-		reservations for those cars, if any.
-		<br><br>
-        5) Show all cars that have travelled 5000 kms or more since their last maintenance.
-        <br><br>
-        6) Find the car with the highest/lowest number of rentals.
-        <br><br>
-        7) Find all cars that are damaged or need a repair.
+                        <br>
+                        <h2>View cars by location</h2>
+                        <form class="form-seeCars" action="/admin/cars_at_location" method="post">
+                            {% for place in locations %}            
+                                <input type="radio" name="site" value={{place[0]}}> {{place[0]}}<br>
+                            {% endfor %}
+                            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Search!">
+                        </form>
+                        <br><br>
+
+
+                        <h2>Sort cars by odometer reading</h2>
+                        <form class="form-seeCars-by-odometer" action="/admin/cars_by_km" method="post">
+                            See all cars with odometer reading between <input type="number" name="minKm">km and <input type="number" name="maxKm">km.
+                            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Search!">
+                        </form>
+                        <br><br>
+
+
+                        <h2>Sort cars by number of rentals</h2>
+                        <form class="form-seeCars-by-rentals" action="/admin/cars_by_rentals" method="post">
+                            Sort cars by number of rentals
+                            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Search!">
+                        </form>
+                        <br><br>
+
+
+                        <h2>Show all damaged cars</h2>
+                        <form class="form-seeCars-by-rentals" action="/admin/cars_by_damage" method="post">
+                            Find all cars that are damages or need a repair.
+                            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Search!">
+                        </form>
+
 
 
       </div>
