@@ -186,13 +186,7 @@ def logout():
     return redirect(url_for('homepage'))
 
 
-@app.route('/member/reserve', methods=['GET', 'POST'])
-def reservationPage():
-        if request.method == 'GET':
-                session['startingDay'] = False
-                session['numberOfDays'] = False
-                session['day'] = False
-		return render_template('reservation.html', firstName = session['FName'], dateSelected=session['day'] )
+
 
 @app.route('/member/pickup_dropoff', methods=['GET', 'POST'])
 def pickup_dropoff():
@@ -282,8 +276,11 @@ def pickup_dropoff():
 
 @app.route('/member/reserve', methods=['GET', 'POST'])
 def reservationPage():
-	if request.method == 'GET':
-		return render_template('reservation.html', firstName = session['FName'])
+        if request.method == 'GET':
+                session['startingDay'] = False
+                session['numberOfDays'] = False
+                session['day'] = False
+		return render_template('reservation.html', firstName = session['FName'], dateSelected=session['day'] )
 	elif request.method == 'POST':
             if session['day'] == False:
 		session['startingDay'] = request.values.get('inputDay')
