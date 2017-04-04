@@ -494,7 +494,7 @@ def cars_admin():
 @app.route('/admin/car_history', methods=['GET','POST'])
 def car_history():
         if request.method == 'GET':
-            sql = "SELECT VIN FROM car"
+            sql = "SELECT VIN, carTypeID FROM car"
             cursor.execute(sql)
             cars = cursor.fetchall()
             return render_template('car_history.html', carSelected=False, firstName = session['FName'], theThing=cars)

@@ -8,7 +8,7 @@
 	<form class="form-selectCar" action="/admin/car_history" method="post">
 	<form>
 		{% for avaliable in theThing %}
-			<input type="radio" name="cars" value={{ avaliable[0] }}> {{ avaliable[0] }}<br>
+			<input type="radio" name="cars" value={{ avaliable[0] }}> {{ avaliable[0] }} {{ avaliable[1]}}<br>
 		{% endfor %}
 		<input type="submit" class="btn btn-lg btn-primary btn-block" value="See this car's rental history!">
 	</form>
