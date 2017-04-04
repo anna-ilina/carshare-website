@@ -7,11 +7,25 @@
 		<h3>Select a location!</h3>
 		<form class="form-signin" action="/signup" method="post">
 		
+		<form class="form-seeCars" action="/member/locations" method="post">
+		{% if locationSelected == False %}
 		<form>
 		{% for places in theThing %}			
 			<input type="radio" name="sites" value={{places[0]}}> {{places[0]}}<br>
+			<input type="radio" name="sites" value={{ places[0] }}> {{ places[0] }}<br>
+		{% endfor %}
+		<input type="submit" class="btn btn-lg btn-primary btn-block" value="See cars at location!">
+		</form>
+		{% endif %}
+		
+		{% if locationSelected == True %}
+		<form>
+		{% for avaliable in theLocation %}
+			<input type="radio" name="cars" value={{ avaliable[0] }}> {{ avaliable[0] }}<br>
 		{% endfor %}
 		</form>
+		{% endif %}
+		
 		
 		<input type="submit" class="btn btn-lg btn-primary btn-block" value="See cars at location!">
       </div>
@@ -19,3 +33,4 @@
 
 
 {% endblock %}
+
