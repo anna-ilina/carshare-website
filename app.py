@@ -265,14 +265,29 @@ def isUser(ID):
 @app.route('/member/locations', methods=['GET','POST'])
 def locationsPage():
         if request.method == 'GET':
+                session['ch'] = False
                 sql = "SELECT parkingAddress FROM parking_locations"
                 cursor.execute(sql)
                 Addresses = cursor.fetchall()
-                print Addresses
-                return render_template('locations2.html', theThing=Addresses, firstName = session['FName'])
+                return render_template('locations2.html', theThing=Addresses, locationSelected=False, firstName = session['FName'])
         elif request.method == 'POST':
-        	return
-
+            if session['ch'] == False:
+                whichLot = request.values.get("sites")
+                print whichLot
+                sql = "SELECT carTypeID, vin FROM car WHERE parkingAddress=%s"
+                cursor.execute(sql, whichLot)
+                data = cursor.fetchall()
+                print data
+                session['ch'] = True
+                return render_template('locations2.html', theLocation=data, locationSelected=True, firstName = session['FName'])
+            else:
+                whichCar = request.values.get("cars")
+                sql = "SELECT * FROM car_rental_history WHERE VIN=%s"
+                cursor.execute(sql, whichCar)
+                rentals = cursor.fetchall()
+                print whichCar
+                return render_template('locations2.html', firstName = session['FName'], locationSelected="3", rentals=rentals)
+ 
 @app.route('/member/pickup_dropoff')
 def pickup_dropoff():
 	return render_template('pickup_dropoff.html', firstName = session['FName'])
