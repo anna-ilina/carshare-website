@@ -6,23 +6,33 @@
  
       <div class="jumbotron">
         <h1>Make a reservation with Kingston Carshare</h1>
-        <form class="form-signin" action="/reserve" method="post">
-
-        <label for="inputVIN" class="sr-only">Name</label>
-        <input type="text" name="inputVIN" class="form-control" placeholder="VIN" required autofocus>
+		{% if dateSelected == False %}
+        <form class="form-selectLoc" action="/member/reserve" method="post">
 
         <label for="inputDay" class="sr-only">Name</label>
         <input type="date" name="inputDay" class="form-control" placeholder="Start Day (YYYY-MM-DD)" required autofocus>
 
         <label for="inputNumDays" class="sr-only">Name</label>
         <input type="text" name="inputNumDays" class="form-control" placeholder="Number of days for reservation" required autofocus>
-
-        <label for="inputID" class="sr-only">Name</label>
-        <input type="text" name="inputID" class="form-control" placeholder="Member ID" required autofocus>
+         
+        <!--<button id="btnSignUp" class="btn btn-lg btn-primary btn-block" type="button">Sign up</button>-->
+        <input type="submit" class="btn btn-lg btn-primary btn-block" value="Select Date!">
+      </form>
+	  {% endif %}
+		{% if dateSelected == True %}
+		<form class="form-selectCar" action="/member/reserve" method="post">
+		
+        {% for cars in theThing %}			
+			<input type="radio" name="selected" value={{cars[0]}}> {{cars[0]}} {{cars[1]}}<br>
+		{% endfor %}
          
         <!--<button id="btnSignUp" class="btn btn-lg btn-primary btn-block" type="button">Sign up</button>-->
         <input type="submit" class="btn btn-lg btn-primary btn-block" value="Reserve Now!">
       </form>
+	  {% endif %}
+		{% if dateSelected == "Success" %}
+		<h1>SUCCESS!</h1>
+		{% endif %}
       </div>
  
        

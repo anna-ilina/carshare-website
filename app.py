@@ -9,6 +9,7 @@ from flask.ext.mysql import MySQL
 app = Flask(__name__)
 mysql = MySQL()
 app.secret_key = 'SUSHI'
+from random import randint
  
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root' # user Anna probably has a password?
@@ -182,36 +183,42 @@ def logout():
     session['isAdmin'] = None
     return redirect(url_for('homepage'))
 
+
+
 @app.route('/member/reserve', methods=['GET', 'POST'])
 def reservationPage():
         if request.method == 'GET':
-		return render_template('reservation.html', firstName = session['FName'])
+                session['startingDay'] = False
+                session['numberOfDays'] = False
+                session['day'] = False
+		return render_template('reservation.html', firstName = session['FName'], dateSelected=session['day'] )
 	elif request.method == 'POST':
-		print(str(request.args))
-		VIN = request.values.get('inputVIN')
-		startingDay = request.values.get('inputDay')
-		numberOfDays = request.values.get('inputNumDays')
-		userID = request.values.get('inputID')
-                errorFlag = False
-
-		if isCar == False:
-                        errorFlag = True
-		elif isReserved(startingDay,numberOfDays,VIN) == True:
-                        errorFlag = True
-                elif isUser == False:
-                        errorFlag = True                        
-
-
-
-
-		if errorFlag == False:
-			newReservationID = createNewReservationID()
-			newEntryCode = createNewEntryCode()
-			sql = "INSERT INTO reservations VALUES (%s, %s, %s, %s, %s, %s)"
-			cursor.execute(sql, (newReservationID, userID, VIN, startingDay, newEntryCode, numberOfDays))
-			conn.commit()
-			return str("Reservation complete? Check db")
-	    #do a check if admin
+            if session['day'] == False:
+		session['startingDay'] = request.values.get('inputDay')
+		session['numberOfDays'] = request.values.get('inputNumDays')
+		session['day'] = True
+                sql = "SELECT VIN, carTypeID FROM car WHERE VIN NOT IN (SELECT VIN FROM reservations WHERE %s >= DATEDIFF(%s,reservations.rentalDate) AND DATEDIFF(%s,reservations.rentalDate) >= 0)"
+                cursor.execute(sql, (session['numberOfDays'], session['startingDay'], session['startingDay']))
+                data = cursor.fetchall()
+                return render_template('reservation.html', firstName = session['FName'], dateSelected=session['day'], theThing=data)
+            else:
+                carToRent = request.values.get('selected')
+                print carToRent
+                sql = "SELECT memberID FROM member WHERE email=%s"
+                cursor.execute(sql, session['email'])
+                data = cursor.fetchone()
+                print data[0]
+                reservationID = createNewReservationID()
+                print reservationID
+                entryCode = createNewEntryCode()
+                print entryCode
+                print session['startingDay']
+                print session['numberOfDays']
+                sql = "INSERT INTO reservations VALUES (%s, %s, %s, %s, %s, %s)"
+                cursor.execute(sql, (reservationID, data, carToRent, session['startingDay'], entryCode, session['numberOfDays']))
+                conn.commit()
+                session['day'] = "Success"
+                return render_template('reservation.html', firstName = session['FName'], errorMessage = "Reservation Successful", dateSelected=session['day'])
 
 
 def createNewReservationID():
@@ -221,7 +228,6 @@ def createNewReservationID():
                 sql = "SELECT reservationID FROM reservations WHERE reservationID=%s"
                 cursor.execute(sql, (randomInt))
                 data = cursor.fetchone()
-                print data
                 if data == None:
                         notRandom = False
         return randomInt
@@ -234,19 +240,9 @@ def createNewEntryCode():
                 sql = "SELECT reservationID FROM reservations WHERE reservationID=%s"
                 cursor.execute(sql, (randomInt))
                 data = cursor.fetchone()
-                print data
                 if data == None:
                         notRandom = False
         return randomInt	
-
-def isReserved(startDate,numDays,VIN):
-        sql = "SELECT VIN FROM reservations WHERE %s > DATEDIFF(%s,reservations.rentalDate) AND DATEDIFF(%s,reservations.rentalDate) > 0 AND VIN=%s"
-        cursor.execute(sql, (numDays, startDate, startDate, VIN))
-        data = cursor.fetchone()
-        if data != None:
-                return True
-        else:
-                return False
 
 def isCar(VIN):
         sql = "SELECT vin FROM car WHERE vin=%s"
