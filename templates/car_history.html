@@ -2,16 +2,80 @@
 {% set active_page = "car_history" %}
  
 {% block content %}
+	<div class="jumbotron">
+	{% if carSelected == False %}
+	<h1>Check Rental History</h1>
+	<form class="form-selectCar" action="/admin/car_history" method="post">
+	<form>
+		{% for avaliable in theThing %}
+			<input type="radio" name="cars" value={{ avaliable[0] }}> {{ avaliable[0] }}<br>
+		{% endfor %}
+		<input type="submit" class="btn btn-lg btn-primary btn-block" value="See this car's rental history!">
+	</form>
+	</form>
+	{% endif %}
+	{% if carSelected == True %}
+        <h1>This car's rental history</h1>
 
-      <div class="jumbotron">
-        <h1>Car rental history</h1>
 
-        *this page is just a filler for now*
-        <br><br>
-        3) Show the rental history for a car
+        <!--
+            {% for rental in rentals %}
+                {{rental[0]}}, {{rental[1]}}, {{rental[2]}}, {{rental[3]}}, {{rental[4]}}, {{rental[5]}}<br> <br> 
+            {% endfor %}
+        -->
+
+
+        {% if rentals == () %}
+
+            <br>
+            This car has no previous rentals
+
+        {% else %}
+
+
+        <table class="table table-bordered">
+
+
+
+            {% for rental in rentals %}
+			<thead>
+				<tr>
+                    <th>reservation ID</th>
+                    <th>member ID</th>
+					<th>pickUpKm</th>
+					<th>dropOffKm</th>
+					<th>statusOnPickup</th>
+                </tr>
+                <tr>
+                    <td style="text-align:left">{{rental[0]}}</td>
+                    <td style="text-align:left">{{rental[1]}}</td>
+                    <td style="text-align:left">{{rental[2]}}</td>
+                    <td style="text-align:left">{{rental[3]}}</td>
+                    <td style="text-align:left">{{rental[4]}}</td>
+					
+                </tr>
+				<tr>
+					<th>statusOnReturn</th>
+					<th>pickUpTime</th>
+                    <th>dropOffTime</th>
+                    <th>VIN</th>
+				</tr>
+				<tr>
+					<td style="text-align:left">{{rental[5]}}</td>
+                    <td style="text-align:left">{{rental[6]}}</td>
+                    <td style="text-align:left">{{rental[7]}}</td>
+                    <td style="text-align:left">{{rental[8]}}</td>
+				</tr>
+			</thead>
+            {% endfor %}
+
+            {% endif %}
+
+        </table>
 
 
       </div>
+	{% endif %}
 
 
 

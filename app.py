@@ -320,13 +320,33 @@ def reservations_admin():
 def cars_admin():
 	return render_template('cars_admin.html', firstName = session['FName'])
 
-@app.route('/admin/car_history')
+@app.route('/admin/car_history', methods=['GET','POST'])
 def car_history():
-	return render_template('car_history.html', firstName = session['FName'])
+        if request.method == 'GET':
+            sql = "SELECT VIN FROM car"
+            cursor.execute(sql)
+            cars = cursor.fetchall()
+            return render_template('car_history.html', carSelected=False, firstName = session['FName'], theThing=cars)
+        if request.method == 'POST':
+            VIN = request.values.get("cars")
+            sql = "SELECT * FROM car_rental_history WHERE VIN=" + VIN
+            cursor.execute(sql)
+            vals = cursor.fetchall()
+            return render_template('car_history.html', carSelected=True, rentals=vals, firstName = session['FName'])
 
-@app.route('/admin/add_car')
+@app.route('/admin/add_car', methods=['GET','POST'])
 def add_car():
-	return render_template('add_car.html', firstName = session['FName'])
+        if request.method == 'GET':
+            return render_template('add_car.html', firstName = session['FName'])
+        if request.method == 'POST':
+            VIN = request.values.get('inputVIN')
+	    Type = request.values.get('inputType')
+	    Address = request.values.get('inputAddress')
+	    sql = "INSERT INTO car VALUES (%s, %s, %s)"
+	    cursor.execute(sql, (VIN, Type, Address))
+	    conn.commit()
+	    return render_template('add_car.html', firstName = session['FName'],errorMessage = "Success!")
+            
 
 @app.route('/admin/invoice', methods=['GET','POST'])
 def invoice():
