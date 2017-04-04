@@ -22,6 +22,7 @@
         <nav>
           <ul class="nav nav-pills pull-right">
             <li role="presentation"{% if active_page == "homepage" or active_page == "welcome_user" or active_page == "welcome_admin" %}class="active"{% endif %}><a href="/homepage">Home</a></li>
+            <li role="presentation"{% if active_page == "comments" %}class="active"{% endif %}><a href="/comments">Ratings</a></li>
             {% if firstName == None %} 
               <li role="presentation"{% if active_page == "signin" %}class="active"{% endif %}><a href="/signin">Sign In</a></li>
               <li role="presentation"{% if active_page == "signup" %}class="active"{% endif %}><a href="/signup">Sign Up</a></li>

@@ -531,6 +531,10 @@ def invoice():
                 returnSentence = "User " + fuckery + "'s annual invoice totals " + str(data[0]) + " dollars"
                	return render_template('invoice.html', invoiceResult=returnSentence, theThing=Members, firstName = session['FName'])
 
+@app.route('/comments', methods=['GET', 'POST'])
+def comments():
+	return render_template('comments.html', firstName = session['FName'])
+
 # @app.route('/showEmployee')
 # def db():
 #     db = MySQLdb.connect("localhost","myusername","mypassword","mydbname" )
