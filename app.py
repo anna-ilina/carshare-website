@@ -516,12 +516,12 @@ def add_car():
 def invoice():
         Members = False
 	if request.method == 'GET':
-                sql = "SELECT memberID FROM member"
+                sql = "SELECT memberID, FName, LName FROM member"
                 cursor.execute(sql)
                 Members = cursor.fetchall()
                 return render_template('invoice.html', theThing=Members, firstName = session['FName'])
         elif request.method == 'POST':
-                sql = "SELECT memberID FROM member"
+                sql = "SELECT memberID, FName, LName FROM member"
                 cursor.execute(sql)
                 Members = cursor.fetchall()
                 fuckery = request.values.get('selected')

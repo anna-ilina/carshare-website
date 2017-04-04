@@ -14,7 +14,7 @@
 		
 		<form>
 		{% for places in theThing %}			
-			<input type="radio" name="selected" value={{places[0]}}> {{places[0]}}<br>
+			<input type="radio" name="selected" value={{places[0]}}> {{places[0]}} {{places[1]}} {{places[2]}}<br>
 		{% endfor %}
 		
 		<input type="submit" class="btn btn-lg btn-primary btn-block" value="Generate Invoice!">
