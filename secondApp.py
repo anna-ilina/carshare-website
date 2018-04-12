@@ -13,7 +13,7 @@ app.secret_key = 'SUSHI'
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root' # user Anna probably has a password?
 app.config['MYSQL_DATABASE_PASSWORD'] = ''
-app.config['MYSQL_DATABASE_DB'] = 'carshare_sushi_v2'
+app.config['MYSQL_DATABASE_DB'] = 'ktowncarshare2'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost' # this machine
 mysql.init_app(app)
 
@@ -261,4 +261,4 @@ def locationsPage():
                 
 
 if __name__ == "__main__":
-    app.run(threaded=True, debug=True) # threaded=True help ctrl+c work in command line to close it
+        app.run(threaded=True, debug=True) # threaded=True help ctrl+c work in command line to close it
